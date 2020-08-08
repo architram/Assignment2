@@ -54,6 +54,22 @@ int main(int argc, char *argv[]) {
             success = moveUp(board);
         } else if (c == KEYBOARD_DOWN) {
             success = moveDown(board);
+        } else if (c == 'r'){
+        	printfGame("RESTART? (y/n)");
+        	c = getcharX();
+        	if (c == 'y'){
+				freeBoard(board);
+				newBoard();
+				if (argv[1] == NULL){
+			        addRandom(board);
+        			addRandom(board);
+				}
+				else{
+					boardWasPopulated = populateBoard(board, argc, argv);	
+				}
+        	} else {
+        		drawBoard(board);
+        	}
         } else if (c == 'q') {
             printfGame(">> QUIT? (y/n)");
             c = getcharX();
@@ -125,7 +141,12 @@ Board newBoard() {
 // This function frees the malloc  row by row and then the whole board.
 void freeBoard(Board board) {
 	int i = 0;
+	int j = 0;
 	while (i < SIZE){
+		while (j < SIZE){
+			free(board[i][j]);
+			j = j + 1;
+		}
 		free(board[i]);
 		i = i + 1;
 	}
@@ -289,14 +310,13 @@ int moveUpMerge (Board board){
 		col = 0;
 		while (col < SIZE){
 			if (board[row][col] != NULL && board[row-1][col] != NULL){
-				comp1 = atoi(board[row][col] + 2);
-				comp2 = atoi(board[row-1][col] + 2);
+				comp1 = strtol(board[row][col] + 2, NULL, 16);
+				comp2 = strtol(board[row-1][col] + 2, NULL, 16);
 				//printf("a1: %d a2: %d\n",a1,a2);
 				if (comp1 == comp2){
 					count = 1;
 					mergedInt = comp1 * 2;
-					sprintf(board[row-1][col], "0x%d",mergedInt);
-	
+					sprintf(board[row-1][col], "0x%x",mergedInt);
 					free(board[row][col]);
 					board[row][col] = NULL;
 				}
@@ -376,16 +396,16 @@ int moveDownMerge (Board board){
 		col = SIZE - 1;
 		while (col >= 0){
 			if (board[row][col] != NULL && board[row+1][col] != NULL){
-				comp1 = atoi(board[row][col] + 2);
-				comp2 = atoi(board[row+1][col] + 2);
+				comp1 = strtol(board[row][col] + 2, NULL, 16);
+				comp2 = strtol(board[row+1][col] + 2, NULL , 16);
 				//printf("a1: %d a2: %d\n",a1,a2);
 				if (comp1 == comp2){
 					//printf("i:%d k:%d\n",i,k);
 					count = 1;
 					mergedInt = comp1 * 2;
-					sprintf(board[row+1][col],"0x%d",mergedInt);
+					sprintf(board[row+1][col],"0x%x",mergedInt);
 					//printf("integer: %d\n",mergedInt);
-					//printf("string: %s\n",board[i+1][k]);
+					//printf("string: %s\n",board[row+1][col]);
 					free(board[row][col]);
 					board[row][col] = NULL;
 				}
@@ -466,14 +486,14 @@ int moveLeftMerge (Board board){
 		while (col < SIZE){
 			if (board[row][col] != NULL && 
 				board[row][col-1] != NULL){
-				comp1 = atoi(board[row][col] + 2);
-				comp2 = atoi(board[row][col-1] + 2);
+				comp1 = strtol(board[row][col] + 2, NULL, 16);
+				comp2 = strtol(board[row][col-1] + 2, NULL, 16);
 				//printf("a1: %d a2: %d\n",a1,a2);
 				if (comp1 == comp2){
 					//printf("i:%d k:%d\n",i,k);
 					count = 1;
 					mergedInt = comp1 * 2;
-					sprintf(board[row][col-1],"0x%d",mergedInt);
+					sprintf(board[row][col-1],"0x%x",mergedInt);
 					//printf("integer: %d\n",mergedInt);
 					//printf("string: %s\n",board[i+1][k]);
 					free(board[row][col]);
@@ -512,13 +532,13 @@ int moveLeft(Board board) {
 //  cells were moved
 int moveRightSlide (Board board){
 	int col = SIZE - 2;
-	int row = SIZE - 1;
+	int row = 0;
 	int repeat = 0;
 	int count = 0;
 
 	while (repeat < SIZE){
-		row = SIZE - 1;
-		while (row >= 0){
+		row = 0;
+		while (row < SIZE){
 			col = SIZE - 2;
 			while (col >= 0){
 				if (board[row][col] == NULL){
@@ -535,7 +555,7 @@ int moveRightSlide (Board board){
 					col = col - 1;
 				}
 			}
-			row = row - 1;
+			row = row + 1;
 		}
 		repeat = repeat + 1;
 	}
@@ -545,33 +565,33 @@ int moveRightSlide (Board board){
 int moveRightMerge (Board board){		
 	
 	int col = SIZE - 2;
-	int row = SIZE - 1;
+	int row = 0;
 	int mergedInt;
 	int comp1;
 	int comp2;
 	int count = 0;
 
-	while (row >= 0){
+	while (row < SIZE){
 		col = SIZE - 2;
 		while (col >= 0){
 			if (board[row][col] != NULL && board[row][col+1] != NULL){
-				comp1 = atoi(board[row][col] + 2);
-				comp2 = atoi(board[row][col+1] + 2);
+				comp1 = strtol(board[row][col] + 2, NULL, 16);
+				comp2 = strtol(board[row][col+1] + 2, NULL, 16);
 				//printf("a1: %d a2: %d\n",a1,a2);
 				if (comp1 == comp2){
 					//printf("i:%d k:%d\n",i,k);
 					count = 1;
 					mergedInt = comp1 * 2;
-					sprintf(board[row][col+1],"0x%d",mergedInt);
+					sprintf(board[row][col+1],"0x%x",mergedInt);
 					//printf("integer: %d\n",mergedInt);
-					//printf("string: %s\n",board[i+1][k]);
+					//printf("string: %s\n",board[row][col+1]);
 					free(board[row][col]);
 					board[row][col] = NULL;
 				}
 			}
 			col = col - 1;
 		}
-		row = row - 1;
+		row = row + 1;
 	}
 	
 	return count;
